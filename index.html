@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>诚挚邀请 | 张伟 & 李晓芳的婚礼</title>
+    <!-- 微信分享配置 -->
+    <meta property="og:title" content="诚邀参加我们的婚礼">
+    <meta property="og:description" content="执子之手，与子偕老 | 2024.10.01">
+    <meta property="og:image" content="https://yourdomain.com/share.jpg">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+            background: #fff5f8;
+            -webkit-tap-highlight-color: transparent;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 750px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            padding: 30px 0;
+        }
+
+        .couple-name {
+            color: #e74c3c;
+            font-size: 28px;
+            margin: 20px 0;
+            letter-spacing: 3px;
+        }
+
+        .date {
+            color: #666;
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+
+        .qr-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 30px 0;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.1);
+        }
+
+        .qr-code {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto;
+            padding: 10px;
+            background: white;
+        }
+
+        .qr-tip {
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+            margin-top: 15px;
+        }
+
+        .info-card {
+            background: rgba(255,255,255,0.95);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .info-title {
+            color: #e74c3c;
+            font-size: 20px;
+            margin-bottom: 15px;
+        }
+
+        .info-text {
+            color: #666;
+            line-height: 1.8;
+            font-size: 16px;
+            margin: 10px 0;
+        }
+
+        /* 微信样式优化 */
+        ::-webkit-scrollbar {
+            display: none;
+            width: 0;
+            height: 0;
+            color: transparent;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="couple-name">张伟 ❤ 李晓芳</h1>
+            <p class="date">2024年10月1日 北京</p>
+        </div>
+
+        <div class="qr-section">
+            <div id="qrcode" class="qr-code"></div>
+            <p class="qr-tip">微信扫一扫查看电子请柬</p>
+        </div>
+
+        <div class="info-card">
+            <h2 class="info-title">婚礼信息</h2>
+            <p class="info-text">📅 日期：2024年10月1日</p>
+            <p class="info-text">⏰ 时间：下午18:08</p>
+            <p class="info-text">🏨 地点：幸福大酒店宴会厅</p>
+            <p class="info-text">📍 地址：北京市朝阳区幸福路88号</p>
+        </div>
+
+        <div class="info-card">
+            <h2 class="info-title">导航指引</h2>
+            <p class="info-text">🚗 自驾：酒店提供免费停车场</p>
+            <p class="info-text">🚇 地铁：1号线幸福路站D出口</p>
+            <a href="https://map.qq.com/?type=marker&marker=coord:39.90872,116.39748;title:幸福大酒店" 
+               class="info-text" style="color:#e74c3c;text-decoration:none;">
+               📌 点击查看地图导航
+            </a>
+        </div>
+    </div>
+
+    <script src="https://cdn.staticfile.org/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script>
+        // 自动生成当前页面二维码
+        new QRCode(document.getElementById("qrcode"), {
+            text: window.location.href,
+            width: 180,
+            height: 180,
+            colorDark: "#e74c3c",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.H
+        });
+
+        // 微信分享配置
+        document.addEventListener('WeixinJSBridgeReady', function() {
+            WeixinJSBridge.invoke('updateAppMessageShareData', {
+                title: '诚邀参加我们的婚礼',
+                desc: '2024.10.01 幸福大酒店恭候您',
+                link: window.location.href,
+                imgUrl: 'https://yourdomain.com/share.jpg'
+            });
+        });
+
+        // 禁止下拉刷新
+        document.body.addEventListener('touchmove', function(e) {
+            e.preventDefault();
+        }, { passive: false });
+    </script>
+</body>
+</html>
