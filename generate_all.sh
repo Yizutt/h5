@@ -1,13 +1,13 @@
 #!/data/data/com.termux/files/usr/bin/bash
 set -e
 
-echo ">>> [1/4] 创建目录结构..."
+echo ">>> [1/5] 创建目录结构..."
 
 mkdir -p ~/ndkbox_automation/automation/templates
 mkdir -p ~/ndkbox_automation/automation/screenshots
 mkdir -p ~/ndkbox_automation/automation/utils
 
-echo ">>> [2/4] 写入主程序 main.py..."
+echo ">>> [2/5] 写入主程序 main.py..."
 
 cat > ~/ndkbox_automation/automation/main.py << 'EOF'
 import os
@@ -20,10 +20,13 @@ from utils.template_match import match_template
 def main():
     log("自动化程序开始")
     adb_connect()
-    launch_app("com.aide.ui")
-    match_template("templates/reward_button.png", threshold=0.85)
-    tap_button((100, 200))  # 示例坐标
-    text = extract_text("screenshots/screen.png")
+    launch_app("com.example.targetapp")
+    pos = match_template("templates/reward_button.png", threshold=0.85)
+    if pos:
+        tap_button(pos)
+    else:
+        log("未检测到匹配按钮")
+    text = extract_text("screenshots/current.png")
     log(f"识别到的文字: {text}")
 
 if __name__ == "__main__":
@@ -33,10 +36,21 @@ EOF
 echo ">>> 写入配置文件 config.json..."
 cat > ~/ndkbox_automation/automation/config.json << 'EOF'
 {
-  "package": "com.aide.ui",
-  "match_threshold": 0.85,
-  "screenshot_path": "screenshots/screen.png"
+  "screenshot_path": "automation/screenshots/current.png",
+  "template_path": "automation/templates/reward_button.png",
+  "package_name": "com.example.targetapp"
 }
+EOF
+
+echo ">>> 写入配置加载模块 config.py..."
+cat > ~/ndkbox_automation/automation/config.py << 'EOF'
+import json
+import os
+
+def load_config():
+    path = os.path.join(os.path.dirname(__file__), "config.json")
+    with open(path, "r", encoding="utf-8") as f:
+        return json.load(f)
 EOF
 
 echo ">>> 写入 requirements.txt..."
@@ -46,12 +60,12 @@ numpy
 pytesseract
 EOF
 
-echo ">>> 写入 template_readme.txt..."
+echo ">>> 写入 templates/template_readme.txt..."
 cat > ~/ndkbox_automation/automation/templates/template_readme.txt << 'EOF'
 请将 reward_button.png 放在此目录中用于图像识别。
 EOF
 
-echo ">>> [3/4] 写入 utils/logger.py..."
+echo ">>> [3/5] 写入 utils/logger.py..."
 cat > ~/ndkbox_automation/automation/utils/logger.py << 'EOF'
 import time
 
@@ -117,7 +131,7 @@ import cv2
 import numpy as np
 import os
 from .logger import log
-from ..config import load_config
+from automation.config import load_config
 
 def match_template(template_path, threshold=0.85):
     config = load_config()
@@ -145,40 +159,19 @@ def match_template(template_path, threshold=0.85):
         return None
 EOF
 
-echo ">>> [4/4] 写入 config.json 和配置加载脚本..."
-cat > ~/ndkbox_automation/automation/config.json << 'EOF'
-{
-  "screenshot_path": "automation/screenshots/current.png",
-  "template_path": "automation/templates/reward_button.png",
-  "package_name": "com.example.targetapp"
-}
-EOF
-
-cat > ~/ndkbox_automation/automation/config.py << 'EOF'
-import json
-import os
-
-def load_config():
-    path = os.path.join(os.path.dirname(__file__), "config.json")
-    with open(path, "r", encoding="utf-8") as f:
-        return json.load(f)
-EOF
-
-echo ">>> 写入 install_automation.sh..."
+echo ">>> [4/5] 写入 install_automation.sh..."
 cat > ~/ndkbox_automation/install_automation.sh << 'EOF'
 #!/data/data/com.termux/files/usr/bin/bash
-
 set -e
 
-echo "[*] 安装 Python 依赖..."
+echo "[*] 安装 Python 与依赖..."
 pkg install -y python git
-pip install --upgrade pip
-pip install -r ~/ndkbox_automation/automation/requirements.txt
+pip install -r ~/ndkbox_automation/automation/requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
 
-echo "[*] 设置权限..."
+echo "[*] 设置执行权限..."
 chmod +x ~/ndkbox_automation/run.sh
 
-echo "[*] 安装完成。请执行 ./run.sh 启动自动化脚本。"
+echo "[*] 安装完成。请执行 ./run.sh 启动自动化程序。"
 EOF
 
 chmod +x ~/ndkbox_automation/install_automation.sh
@@ -186,13 +179,13 @@ chmod +x ~/ndkbox_automation/install_automation.sh
 echo ">>> 写入 run.sh..."
 cat > ~/ndkbox_automation/run.sh << 'EOF'
 #!/data/data/com.termux/files/usr/bin/bash
-
 cd "$(dirname "$0")/automation"
 python main.py
 EOF
 
 chmod +x ~/ndkbox_automation/run.sh
 
-echo ">>> 所有文件与脚本生成完成。"
+echo ">>> [5/5] 自动执行依赖安装..."
+bash ~/ndkbox_automation/install_automation.sh
 
-echo ">>> 下一步：运行 install_automation.sh 安装依赖。"
+echo ">>> 所有生成完毕，系统已准备完毕。可执行 ./run.sh 启动。"
